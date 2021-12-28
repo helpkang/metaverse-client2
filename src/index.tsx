@@ -1,13 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import './index.scss';
 import reportWebVitals from './reportWebVitals';
+import Home from './ui/home/Home';
+import Metaverse from './ui/home/mv/MetaVerse';
 
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
+  <BrowserRouter>
+  <Routes>
+    <Route path="/" element={<Home />} />
+    <Route path="/mv" element={<Metaverse />} />
+  </Routes>
+  </BrowserRouter>,
   document.getElementById('root')
 );
 
