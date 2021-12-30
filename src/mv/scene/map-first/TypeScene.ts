@@ -24,7 +24,10 @@ export class BootScene extends Phaser.Scene {
     // start the WorldScene
     this.scene.start("FpsScene");
     this.scene.start("WorldScene");
+
   }
+  
+
 }
 
 const speed = 130;
@@ -40,7 +43,30 @@ export class WorldScene extends Phaser.Scene {
 
   preload() {}
 
+  async loadAsync(){
+    var name = 'card-back';
+    // texture needs to be loaded to create a placeholder card
+   
+
+    let loader = new Phaser.Loader.LoaderPlugin(this);
+    // ask the LoaderPlugin to load the texture
+    loader.image(name, 'https://phaser.io/images/sponsors/twilio300.png');
+    
+    loader.once(Phaser.Loader.Events.COMPLETE, () => {
+      // texture loaded so use instead of the placeholder
+      const card = this.add.image(200, 200, name);
+      setInterval(()=>{
+        card.setX(card.x+1)
+        card.setY(card.y+1)
+      },1000/60)
+        // card.setTexture(name)
+       card.setDepth(1)
+    });
+    loader.start();
+  }
+
   create() {
+    this.loadAsync();
     // create the map
     const map = this.make.tilemap({ key: "map" });
 
@@ -92,7 +118,7 @@ export class WorldScene extends Phaser.Scene {
 
     // our player sprite created through the phycis system
     this.player = this.physics.add.sprite(map.widthInPixels/2, map.heightInPixels/2, "player", 6);
-
+    this.player.setDepth(2)
     // don't go out of the map
     this.physics.world.bounds.width = map.widthInPixels;
     this.physics.world.bounds.height = map.heightInPixels;
