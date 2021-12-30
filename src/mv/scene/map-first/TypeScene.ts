@@ -143,8 +143,7 @@ export class WorldScene extends Phaser.Scene {
   }
   update(time: any, delta: any) {
     //    this.controls.update(delta);
-    if(!this.player || !this.cursors) return;
-    
+    if(!this.player || !this.cursors) return
     this.player.body.setVelocity(0);
 
     // Horizontal movement

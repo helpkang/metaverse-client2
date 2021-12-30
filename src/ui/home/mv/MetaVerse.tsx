@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { mvmain } from '../../../mv/mvmain';
+import './MetaVerse.scss';
 
 function Metaverse() {
     const a = useRef(null);

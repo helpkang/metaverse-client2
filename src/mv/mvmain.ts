@@ -25,16 +25,21 @@ import { BootScene, WorldScene } from "./scene/map-first/TypeScene";
 export function mvmain(parent : HTMLElement|string) : Phaser.Game{
   const game: Phaser.Game = new Phaser.Game({
     parent,
-    type: Phaser.WEBGL,
+    type: Phaser.AUTO,
+    
     
     // width: 1600,
     // height: 1000,
     scale: {
       mode: Phaser.Scale.RESIZE,
+      fullscreenTarget: parent,
       // Center vertically and horizontally
-      autoCenter: Phaser.Scale.CENTER_BOTH,
+      // autoCenter: Phaser.Scale.CENTER_BOTH,
       // width: DEFAULT_WIDTH,
       // height: DEFAULT_HEIGHT,
+      width: '100%',
+      height: '80%',
+      
     },
     zoom: 1,
     pixelArt: true,
@@ -49,6 +54,19 @@ export function mvmain(parent : HTMLElement|string) : Phaser.Game{
     },
     scene: [BootScene, WorldScene, FPSScene],
     // scene: [IslandsMainScene],
+  });
+
+  window.addEventListener("resize", () => {
+    const ratio = Math.max(
+      window.innerWidth / window.innerHeight,
+      window.innerHeight / window.innerWidth
+    );
+    const DEFAULT_HEIGHT = 720; // any height you want
+    const DEFAULT_WIDTH = ratio * DEFAULT_HEIGHT;
+    // game.config.width = DEFAULT_WIDTH
+    // game.config.height = DEFAULT_HEIGHT
+    // game.scale.resize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    // game.scale.resize(window.innerWidth, window.innerHeight-50);
   });
   return game
 }
