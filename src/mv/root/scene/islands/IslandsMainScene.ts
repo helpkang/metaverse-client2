@@ -1,5 +1,5 @@
 import { setEnvironmentData } from 'worker_threads';
-import perlin from '../../lib/perlin'
+import perlin from '../../../lib/perlin'
 const noise = perlin();
 
 const speed = 1;

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { mvmain } from "../../../mv/mvmain";
+import { mvmain } from "../../../mv/root/mvmain";
 import "./MetaVerse.scss";
 
 function Metaverse() {
