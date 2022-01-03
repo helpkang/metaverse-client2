@@ -27,9 +27,7 @@ export function mvmain(canvas : HTMLCanvasElement) : Phaser.Game{
 
     // parent,
     canvas,
-    // type: Phaser.AUTO,
-    type: Phaser.CANVAS,
-    
+    type: Phaser.WEBGL,
     
     // width: 1600,
     // height: 1000,
@@ -42,6 +40,7 @@ export function mvmain(canvas : HTMLCanvasElement) : Phaser.Game{
       // height: DEFAULT_HEIGHT,
       // width: '100%',
       // height: '80%',
+
       
     },
     zoom: 1,
@@ -56,17 +55,18 @@ export function mvmain(canvas : HTMLCanvasElement) : Phaser.Game{
         debug: true,
       },
     },
+
     scene: [BootScene, WorldScene, FPSScene],
     // scene: [IslandsMainScene],
   });
 
   window.addEventListener("resize", () => {
-    const ratio = Math.max(
-      window.innerWidth / window.innerHeight,
-      window.innerHeight / window.innerWidth
-    );
-    const DEFAULT_HEIGHT = 720; // any height you want
-    const DEFAULT_WIDTH = ratio * DEFAULT_HEIGHT;
+    // const ratio = Math.max(
+    //   window.innerWidth / window.innerHeight,
+    //   window.innerHeight / window.innerWidth
+    // );
+    // const DEFAULT_HEIGHT = 720; // any height you want
+    // const DEFAULT_WIDTH = ratio * DEFAULT_HEIGHT;
     // game.config.width = DEFAULT_WIDTH
     // game.config.height = DEFAULT_HEIGHT
     // game.scale.resize(DEFAULT_WIDTH, DEFAULT_HEIGHT);

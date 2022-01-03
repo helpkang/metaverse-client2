@@ -20,7 +20,7 @@ export const speed = 130;
 
 export class WorldScene extends Phaser.Scene {
   player?: Player;
-  they?: Sprite;
+  they?: Player;
 
   spawns?: Phaser.Physics.Arcade.Group;
 
@@ -43,6 +43,30 @@ export class WorldScene extends Phaser.Scene {
       frameConfig: {
         frameWidth: 16,
         frameHeight: 16,
+      },
+      moveKeys: {
+        LEFT: 'LEFT',
+        RIGHT: 'RIGHT',
+        UP: 'UP',
+        DOWN: 'DOWN',
+      },
+    });
+    
+    this.they = new Player({
+      load: this.load,
+      // load: new Phaser.Loader.LoaderPlugin(this),
+      name: "they",
+      url: "/assets/image/RPG_assets.png",
+      scene: this,
+      frameConfig: {
+        frameWidth: 16,
+        frameHeight: 16,
+      },
+      moveKeys: {
+        LEFT: 'A',
+        RIGHT: 'D',
+        UP: 'W',
+        DOWN: 'S',
       },
     });
   }
@@ -67,23 +91,22 @@ export class WorldScene extends Phaser.Scene {
     loader.start();
   }
 
-  async dynamicThey(wall: Phaser.Tilemaps.TilemapLayer) {
-    let loader = new Phaser.Loader.LoaderPlugin(this);
+  // async dynamicThey(wall: Phaser.Tilemaps.TilemapLayer) {
+  //   let loader = new Phaser.Loader.LoaderPlugin(this);
 
-    loader.spritesheet("they1", "/assets/image/RPG_assets.png", {
-      frameWidth: 16,
-      frameHeight: 16,
-    });
+  //   loader.spritesheet("they1", "/assets/image/RPG_assets.png", {
+  //     frameWidth: 16,
+  //     frameHeight: 16,
+  //   });
 
-    loader.once(Phaser.Loader.Events.COMPLETE, () => {
-      console.log("load complete");
-      this.they = this.makeAnimation("they1", wall);
-    });
-    loader.start();
-  }
+  //   loader.once(Phaser.Loader.Events.COMPLETE, () => {
+  //     console.log("load complete");
+  //     this.they = this.makeAnimation("they1", wall);
+  //   });
+  //   loader.start();
+  // }
 
   create() {
-    this.player?.init();
     // create the map
     const map = this.make.tilemap({ key: "map" });
 
@@ -100,6 +123,7 @@ export class WorldScene extends Phaser.Scene {
     //  animation with key 'left', we don't need left and right as we will use one and flip the sprite
     const wall = this.createWall(map, tiles);
     this.player?.addWall(wall);
+    this.they?.addWall(wall);
     // const player = this.makePalyer(wall);
 
     // limit camera to map
@@ -121,9 +145,10 @@ export class WorldScene extends Phaser.Scene {
     // add collider
     // this.physics.add.overlap(this.player.sprite, this.spawns, this.onMeetEnemy.bind(this));
     this.player?.overlap(this.spawns, this.onMeetEnemy.bind(this));
+    this.they?.overlap(this.spawns, this.onMeetEnemy.bind(this));
 
     this.dynamicLoad();
-    this.dynamicThey(wall);
+    // this.dynamicThey(wall);
   }
 
   private setupCamera(map: Phaser.Tilemaps.Tilemap) {
@@ -214,42 +239,8 @@ export class WorldScene extends Phaser.Scene {
 
   update(time: any, delta: any) {
     //    this.controls.update(delta);
-    if (this.player) {
-      this.player.update();
-    }
-
-    if (!this.they) return;
-    this.they.body.setVelocity(0);
-    const { keys } = this.input.keyboard;
-    const { A, S, D, W } = Phaser.Input.Keyboard.KeyCodes;
-    // Horizontal movement
-    if (keys[A].isDown) {
-      this.they.body.setVelocityX(-speed);
-    } else if (keys[D].isDown) {
-      this.they.body.setVelocityX(speed);
-    }
-
-    // Vertical movement
-    if (keys[W].isDown) {
-      this.they.body.setVelocityY(-speed);
-    } else if (keys[S].isDown) {
-      this.they.body.setVelocityY(speed);
-    }
-
-    // Update the animation last and give left/right animations precedence over up/down animations
-    if (keys[A].isDown) {
-      this.they.anims.play("left", true);
-      this.they.flipX = true;
-    } else if (keys[D].isDown) {
-      this.they.anims.play("right", true);
-      this.they.flipX = false;
-    } else if (keys[W].isDown) {
-      this.they.anims.play("up", true);
-    } else if (keys[S].isDown) {
-      this.they.anims.play("down", true);
-    } else {
-      this.they.anims.stop();
-    }
+    this.player?.update();
+     this.they?.update();
   }
 }
 

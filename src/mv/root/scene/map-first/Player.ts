@@ -1,21 +1,48 @@
 import Phaser from "phaser";
 import { speed } from "./TypeScene";
 
+interface MoveKeys {
+  LEFT: string
+  RIGHT: string
+  UP: string
+  DOWN: string
+}
+
+interface KeyboardKey {
+  LEFT: Phaser.Input.Keyboard.Key
+  RIGHT: Phaser.Input.Keyboard.Key
+  UP: Phaser.Input.Keyboard.Key
+  DOWN: Phaser.Input.Keyboard.Key
+}
 export class Player {
   sprite?: Sprite;
-  cursors: Phaser.Types.Input.Keyboard.CursorKeys;
+  // cursors: Phaser.Types.Input.Keyboard.CursorKeys;
+
+  keyboardKey: KeyboardKey
 
   constructor(public opt: PlayerOptions) {
     // our two characters
     opt.load.spritesheet(opt.name, opt.url, opt.frameConfig);
-
-    this.cursors = this.opt.scene.input.keyboard.createCursorKeys();
+    const { moveKeys, scene } = this.opt;
+    const { input } = scene;
+    const {LEFT, RIGHT, UP, DOWN} = moveKeys;
+    this.keyboardKey = {
+      LEFT: input.keyboard.addKey(LEFT),
+      RIGHT: input.keyboard.addKey(RIGHT),
+      UP: input.keyboard.addKey(UP),
+      DOWN: input.keyboard.addKey(DOWN),
+    }
+    opt.load.once(Phaser.Loader.Events.COMPLETE, () => {
+      this.init();
+    });
+    // this.cursors = this.opt.scene.input.keyboard.createCursorKeys();
   }
   init() {
-    const { name } = this.opt;
-    const { anims, physics, input } = this.opt.scene;
+    const { name, scene } = this.opt;
+    const { anims, physics } = scene;
+    
 
-    // input.keyboard.addKeys(["W", "A", "S", "D"]);
+
     anims.create({
       key: "left",
       frames: anims.generateFrameNumbers(name, {
@@ -78,31 +105,33 @@ export class Player {
   update() {
     if (!this.sprite) return;
     this.sprite.body.setVelocity(0);
+    const { LEFT, RIGHT, UP, DOWN } = this.keyboardKey;
+    // const  LEFT = Phaser.Input.Keyboard.KeyCodes[moveKeys.LEFT] ;
 
     // Horizontal movement
-    if (this.cursors.left.isDown) {
+    if (LEFT.isDown) {
       this.sprite.body.setVelocityX(-speed);
-    } else if (this.cursors.right.isDown) {
+    } else if (RIGHT.isDown) {
       this.sprite.body.setVelocityX(speed);
     }
 
     // Vertical movement
-    if (this.cursors.up.isDown) {
+    if (UP.isDown) {
       this.sprite.body.setVelocityY(-speed);
-    } else if (this.cursors.down.isDown) {
+    } else if (DOWN.isDown) {
       this.sprite.body.setVelocityY(speed);
     }
 
     // Update the animation last and give left/right animations precedence over up/down animations
-    if (this.cursors.left.isDown) {
+    if (LEFT.isDown) {
       this.sprite.anims.play("left", true);
       this.sprite.flipX = true;
-    } else if (this.cursors.right.isDown) {
+    } else if (RIGHT.isDown) {
       this.sprite.anims.play("right", true);
       this.sprite.flipX = false;
-    } else if (this.cursors.up.isDown) {
+    } else if (UP.isDown) {
       this.sprite.anims.play("up", true);
-    } else if (this.cursors.down.isDown) {
+    } else if (DOWN.isDown) {
       this.sprite.anims.play("down", true);
     } else {
       this.sprite.anims.stop();
@@ -115,5 +144,6 @@ interface PlayerOptions {
   url: string;
   frameConfig?: Phaser.Types.Loader.FileTypes.ImageFrameConfig;
   scene: Phaser.Scene;
+  moveKeys: MoveKeys;
 }
 export type Sprite = Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
