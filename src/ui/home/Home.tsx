@@ -5,7 +5,7 @@ import './Home.scss';
 function Home() {
   return (
    <div>
-     <Link to='/mv'>metaverse</Link>
+     <Link to='/'>Metaverse</Link> Other
    </div>
   );
 }

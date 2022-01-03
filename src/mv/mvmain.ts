@@ -22,23 +22,26 @@ import { BootScene, WorldScene } from "./scene/map-first/TypeScene";
 // const ratio = Math.max(window.innerWidth / window.innerHeight, window.innerHeight / window.innerWidth)
 // const DEFAULT_HEIGHT = 720 // any height you want
 // const DEFAULT_WIDTH = ratio * DEFAULT_HEIGHT
-export function mvmain(parent : HTMLElement|string) : Phaser.Game{
+export function mvmain(canvas : HTMLCanvasElement) : Phaser.Game{
   const game: Phaser.Game = new Phaser.Game({
-    parent,
-    type: Phaser.AUTO,
+
+    // parent,
+    canvas,
+    // type: Phaser.AUTO,
+    type: Phaser.CANVAS,
     
     
     // width: 1600,
     // height: 1000,
     scale: {
       mode: Phaser.Scale.RESIZE,
-      fullscreenTarget: parent,
+      // fullscreenTarget: canvas,
       // Center vertically and horizontally
       // autoCenter: Phaser.Scale.CENTER_BOTH,
       // width: DEFAULT_WIDTH,
       // height: DEFAULT_HEIGHT,
-      width: '100%',
-      height: '80%',
+      // width: '100%',
+      // height: '80%',
       
     },
     zoom: 1,
@@ -50,6 +53,7 @@ export function mvmain(parent : HTMLElement|string) : Phaser.Game{
           x: 0,
           y: 0,
         },
+        debug: true,
       },
     },
     scene: [BootScene, WorldScene, FPSScene],

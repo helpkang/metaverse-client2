@@ -9,8 +9,8 @@ import Metaverse from './ui/home/mv/MetaVerse';
 ReactDOM.render(
   <BrowserRouter>
   <Routes>
-    <Route path="/" element={<Home />} />
-    <Route path="/mv" element={<Metaverse />} />
+    <Route path="/" element={<Metaverse />} />
+    <Route path="/mv" element={<Home />} />
   </Routes>
   </BrowserRouter>,
   document.getElementById('root')

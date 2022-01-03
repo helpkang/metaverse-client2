@@ -1,3 +1,4 @@
+import { setEnvironmentData } from 'worker_threads';
 import perlin from '../../lib/perlin'
 const noise = perlin();
 
@@ -48,7 +49,8 @@ export class IslandsMainScene extends Phaser.Scene {
      draw(scene: Phaser.Scene) {
     
         const add: Phaser.GameObjects.GameObjectFactory = scene.add;
-        (add as any).displayList.removeAll();
+        const displayList: Phaser.GameObjects.DisplayList = (add as any).displayList
+        displayList.removeAll();
         const {width, height} = this.cameras.default;
         for (let y = 0; y < (height / tilesize); y++) {
             const posY = (y * tilesize) + 8;
