@@ -11,8 +11,8 @@ export class BootScene extends Phaser.Scene {
 
   create() {
     // start the WorldScene
-    this.scene.start("FpsScene");
     this.scene.start("WorldScene");
+    this.scene.start("FpsScene");
   }
 }
 
