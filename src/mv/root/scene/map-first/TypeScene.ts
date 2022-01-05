@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { Player, Sprite } from "./Player";
+import { Player, PlayerOptions } from "./Player";
 
 export class BootScene extends Phaser.Scene {
   constructor() {
@@ -16,11 +16,9 @@ export class BootScene extends Phaser.Scene {
   }
 }
 
-export const speed = 130;
-
 export class WorldScene extends Phaser.Scene {
-  player?: Player;
-  they?: Player;
+  player: Player[] = [];
+
 
   spawns?: Phaser.Physics.Arcade.Group;
 
@@ -34,51 +32,14 @@ export class WorldScene extends Phaser.Scene {
 
     // map in json format
     this.load.tilemapTiledJSON("map", "/assets/tilemaps/basemap.json");
-
-    this.player = new Player({
-      load: this.load,
-      name: "player",
-      url: "/assets/image/RPG_assets.png",
-      scene: this,
-      frameConfig: {
-        frameWidth: 16,
-        frameHeight: 16,
-      },
-      moveKeys: {
-        LEFT: 'LEFT',
-        RIGHT: 'RIGHT',
-        UP: 'UP',
-        DOWN: 'DOWN',
-      },
-    });
-    
-    this.they = new Player({
-      load: this.load,
-      // load: new Phaser.Loader.LoaderPlugin(this),
-      name: "they",
-      url: "/assets/image/RPG_assets.png",
-      scene: this,
-      frameConfig: {
-        frameWidth: 16,
-        frameHeight: 16,
-      },
-      moveKeys: {
-        LEFT: 'A',
-        RIGHT: 'D',
-        UP: 'W',
-        DOWN: 'S',
-      },
-    });
   }
 
   async dynamicLoad() {
     var name = "card-back";
     // texture needs to be loaded to create a placeholder card
-
     let loader = new Phaser.Loader.LoaderPlugin(this);
     // ask the LoaderPlugin to load the texture
     loader.image(name, "https://phaser.io/images/sponsors/twilio300.png");
-
     loader.once(Phaser.Loader.Events.COMPLETE, () => {
       // texture loaded so use instead of the placeholder
       const card = this.add.image(200, 200, name);
@@ -91,47 +52,58 @@ export class WorldScene extends Phaser.Scene {
     loader.start();
   }
 
-  // async dynamicThey(wall: Phaser.Tilemaps.TilemapLayer) {
-  //   let loader = new Phaser.Loader.LoaderPlugin(this);
+  async dynamicPlayerAll(wall: Phaser.Tilemaps.TilemapLayer) {
+    this.makePalyer(wall, {
+      name: "player",
+      url: "/assets/image/RPG_assets.png",
+      scene: this,
+      frameConfig: {
+        frameWidth: 16,
+        frameHeight: 16,
+      },
+      moveKeys: {
+        LEFT: "LEFT",
+        RIGHT: "RIGHT",
+        UP: "UP",
+        DOWN: "DOWN",
+        SPEED_UP2X: "SHIFT",
+        SPEED_UP4X: "CTRL",
+      },
+      // camera: this.cameras.main,
+    });
+    this.makePalyer(wall, {
+      load: this.load,
+      name: "they",
+      url: "/assets/image/RPG_assets.png",
+      scene: this,
+      frameConfig: {
+        frameWidth: 16,
+        frameHeight: 16,
+      },
+      moveKeys: {
+        LEFT: "A",
+        RIGHT: "D",
+        UP: "W",
+        DOWN: "S",
+        SPEED_UP2X: "ALT",
+        SPEED_UP4X: "CTRL",
+      },
+      camera: this.cameras.main,
+    });
+    
+  }
 
-  //   loader.spritesheet("they1", "/assets/image/RPG_assets.png", {
-  //     frameWidth: 16,
-  //     frameHeight: 16,
-  //   });
+  private makePalyer(wall: Phaser.Tilemaps.TilemapLayer, config: PlayerOptions) {
+    const sp = new Player(config);
+    // add collider
+    sp.addWall(wall);
+    sp.overlap(this.getSpwans(), this.onMeetEnemy.bind(this));
 
-  //   loader.once(Phaser.Loader.Events.COMPLETE, () => {
-  //     console.log("load complete");
-  //     this.they = this.makeAnimation("they1", wall);
-  //   });
-  //   loader.start();
-  // }
+    this.player.push(sp);
+  }
 
-  create() {
-    // create the map
-    const map = this.make.tilemap({ key: "map" });
-
-    // first parameter is the name of the tilemap in tiled
-    const tiles = map.addTilesetImage("grass-tiles-2-small", "tiles");
-
-    // creating the layers
-    map.createLayer("ground", tiles);
-
-    // don't go out of the map
-    this.physics.world.bounds.width = map.widthInPixels;
-    this.physics.world.bounds.height = map.heightInPixels;
-
-    //  animation with key 'left', we don't need left and right as we will use one and flip the sprite
-    const wall = this.createWall(map, tiles);
-    this.player?.addWall(wall);
-    this.they?.addWall(wall);
-    // const player = this.makePalyer(wall);
-
-    // limit camera to map
-    this.setupCamera(map);
-
-    // user input
-    this.input.keyboard.addKeys(["W", "A", "S", "D"]);
-
+  getSpwans(): Phaser.Physics.Arcade.Group {
+    if(this.spawns) return this.spawns;
     // where the enemies will be
     this.spawns = this.physics.add.group({
       classType: Phaser.GameObjects.Zone,
@@ -142,21 +114,36 @@ export class WorldScene extends Phaser.Scene {
       // parameters are x, y, width, height
       this.spawns.create(x, y);
     }
-    // add collider
-    // this.physics.add.overlap(this.player.sprite, this.spawns, this.onMeetEnemy.bind(this));
-    this.player?.overlap(this.spawns, this.onMeetEnemy.bind(this));
-    this.they?.overlap(this.spawns, this.onMeetEnemy.bind(this));
-
-    this.dynamicLoad();
-    // this.dynamicThey(wall);
+    return this.spawns;
   }
-
-  private setupCamera(map: Phaser.Tilemaps.Tilemap) {
-    if (!this.player) return;
+  
+  create() {
+    // create the map
+    const map = this.make.tilemap({ key: "map" });
+    
+    // first parameter is the name of the tilemap in tiled
+    const tiles = map.addTilesetImage("grass-tiles-2-small", "tiles");
+    
+    // creating the layers
+    map.createLayer("ground", tiles);
+    
+    // limit camera to map
     this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
-    if (this.player.sprite) this.cameras.main.startFollow(this.player.sprite);
     this.cameras.main.roundPixels = true; // avoid tile bleed
+
+    // don't go out of the map
+    this.physics.world.bounds.width = map.widthInPixels;
+    this.physics.world.bounds.height = map.heightInPixels;
+    
+    //  animation with key 'left', we don't need left and right as we will use one and flip the sprite
+    const wall = this.createWall(map, tiles);
+    // const player = this.makePalyer(wall);
+    
+    this.dynamicLoad();
+    this.dynamicPlayerAll(wall);
   }
+
+  
 
   private createWall(
     map: Phaser.Tilemaps.Tilemap,
@@ -167,56 +154,6 @@ export class WorldScene extends Phaser.Scene {
     // make all tiles in obstacles collidable
     wall.setCollisionByExclusion([-1]);
     return wall;
-  }
-
-  private makePalyer(wall: Phaser.Tilemaps.TilemapLayer): Sprite {
-    return this.makeAnimation("player", wall);
-  }
-
-  private makeAnimation(name: string, wall: Phaser.Tilemaps.TilemapLayer) {
-    this.anims.create({
-      key: "left",
-      frames: this.anims.generateFrameNumbers(name, {
-        frames: [1, 7, 1, 13],
-      }),
-      frameRate: 10,
-      repeat: -1,
-    });
-
-    // animation with key 'right'
-    this.anims.create({
-      key: "right",
-      frames: this.anims.generateFrameNumbers(name, {
-        frames: [1, 7, 1, 13],
-      }),
-      frameRate: 10,
-      repeat: -1,
-    });
-    this.anims.create({
-      key: "up",
-      frames: this.anims.generateFrameNumbers(name, {
-        frames: [2, 8, 2, 14],
-      }),
-      frameRate: 10,
-      repeat: -1,
-    });
-    this.anims.create({
-      key: "down",
-      frames: this.anims.generateFrameNumbers(name, {
-        frames: [0, 6, 0, 12],
-      }),
-      frameRate: 10,
-      repeat: -1,
-    });
-    // this.player = this.physics.add.sprite(map.widthInPixels/2, map.heightInPixels/2, name, 6);
-    const player = this.physics.add.sprite(800, 800, name, 6);
-    player.setDepth(2);
-    player.setCollideWorldBounds(true);
-
-    // don't walk on trees
-    this.physics.add.collider(player, wall);
-
-    return player;
   }
 
   onMeetEnemy(
@@ -237,11 +174,9 @@ export class WorldScene extends Phaser.Scene {
     // start battle
   }
 
-  update(time: any, delta: any) {
-    //    this.controls.update(delta);
-    this.player?.update();
-     this.they?.update();
+  update(time: number, delta: number) {
+    this.player.forEach((player) => {
+      player.update(time, delta);
+    });
   }
 }
-
-

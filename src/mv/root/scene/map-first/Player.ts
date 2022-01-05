@@ -1,47 +1,57 @@
 import Phaser from "phaser";
-import { speed } from "./TypeScene";
+
+const SPEED = 130;
 
 interface MoveKeys {
-  LEFT: string
-  RIGHT: string
-  UP: string
-  DOWN: string
+  LEFT: string;
+  RIGHT: string;
+  UP: string;
+  DOWN: string;
+  SPEED_UP2X?: string;
+  SPEED_UP4X?: string;
 }
 
 interface KeyboardKey {
-  LEFT: Phaser.Input.Keyboard.Key
-  RIGHT: Phaser.Input.Keyboard.Key
-  UP: Phaser.Input.Keyboard.Key
-  DOWN: Phaser.Input.Keyboard.Key
+  LEFT: Phaser.Input.Keyboard.Key;
+  RIGHT: Phaser.Input.Keyboard.Key;
+  UP: Phaser.Input.Keyboard.Key;
+  DOWN: Phaser.Input.Keyboard.Key;
+  SPEED_UP2X?: Phaser.Input.Keyboard.Key;
+  SPEED_UP4X?: Phaser.Input.Keyboard.Key;
 }
 export class Player {
   sprite?: Sprite;
   // cursors: Phaser.Types.Input.Keyboard.CursorKeys;
 
-  keyboardKey: KeyboardKey
+  keyboardKey: KeyboardKey;
 
   constructor(public opt: PlayerOptions) {
     // our two characters
-    opt.load.spritesheet(opt.name, opt.url, opt.frameConfig);
-    const { moveKeys, scene } = this.opt;
+    const { moveKeys, scene, name, url, frameConfig } = this.opt;
     const { input } = scene;
-    const {LEFT, RIGHT, UP, DOWN} = moveKeys;
+    const { LEFT, RIGHT, UP, DOWN, SPEED_UP2X, SPEED_UP4X, } = moveKeys;
     this.keyboardKey = {
       LEFT: input.keyboard.addKey(LEFT),
       RIGHT: input.keyboard.addKey(RIGHT),
       UP: input.keyboard.addKey(UP),
       DOWN: input.keyboard.addKey(DOWN),
-    }
-    opt.load.once(Phaser.Loader.Events.COMPLETE, () => {
+      SPEED_UP2X: SPEED_UP2X? input.keyboard.addKey(SPEED_UP2X) : undefined,
+      SPEED_UP4X: SPEED_UP4X? input.keyboard.addKey(SPEED_UP4X) : undefined,
+    };
+    let {load} = this.opt
+    load = load ? load : new Phaser.Loader.LoaderPlugin(scene);
+    load.spritesheet(name, url, frameConfig);
+    load.once(Phaser.Loader.Events.COMPLETE, () => {
       this.init();
-    });
-    // this.cursors = this.opt.scene.input.keyboard.createCursorKeys();
+    }, scene);
+    load.start();
   }
-  init() {
-    const { name, scene } = this.opt;
-    const { anims, physics } = scene;
-    
+  
+  queue: Function[] = [];
 
+  init() {
+    const { name, scene, camera } = this.opt;
+    const { anims, physics } = scene;
 
     anims.create({
       key: "left",
@@ -82,12 +92,26 @@ export class Player {
     sprite.setDepth(2);
     sprite.setCollideWorldBounds(true);
     this.sprite = sprite;
+    const queue = this.queue;
+    this.queue = [];
+    queue.forEach((fn) => fn());
+    if(camera) {
+      camera.startFollow(this.sprite);
+    }
   }
 
   addWall(wall: Phaser.Tilemaps.TilemapLayer) {
-    if (!this.sprite) return;
     // don't walk on trees
-    this.opt.scene.physics.add.collider(this.sprite, wall);
+    const fn = () => {
+      if (this.sprite) {
+        this.opt.scene.physics.add.collider(this.sprite, wall);
+      }
+    };
+    if (!this.sprite) {
+      this.queue.push(fn);
+      return;
+    }
+    fn();
   }
 
   overlap(
@@ -98,16 +122,27 @@ export class Player {
       | Phaser.GameObjects.Group[],
     callback?: ArcadePhysicsCallback
   ) {
-    if (!this.sprite) return;
-    this.opt.scene.physics.add.overlap(this.sprite, spawns, callback);
+    const fn = () => {
+      if (this.sprite) {
+        this.opt.scene.physics.add.overlap(this.sprite, spawns, callback);
+      }
+    };
+    if (!this.sprite) {
+      this.queue.push(fn);
+      return;
+    }
+    fn();
   }
 
-  update() {
+  update(time: number, delta: number) {
     if (!this.sprite) return;
     this.sprite.body.setVelocity(0);
-    const { LEFT, RIGHT, UP, DOWN } = this.keyboardKey;
+    const { LEFT, RIGHT, UP, DOWN, SPEED_UP2X, SPEED_UP4X } = this.keyboardKey;
     // const  LEFT = Phaser.Input.Keyboard.KeyCodes[moveKeys.LEFT] ;
 
+    const m1 = SPEED_UP2X ? SPEED_UP2X.isDown? 2: 1 : 1;
+    const m2 = SPEED_UP4X ? SPEED_UP4X.isDown? 4: 1 : 1;
+    const speed = SPEED * m1 * m2;
     // Horizontal movement
     if (LEFT.isDown) {
       this.sprite.body.setVelocityX(-speed);
@@ -138,12 +173,13 @@ export class Player {
     }
   }
 }
-interface PlayerOptions {
-  load: Phaser.Loader.LoaderPlugin;
+export interface PlayerOptions {
+  load?: Phaser.Loader.LoaderPlugin;
   name: string;
   url: string;
   frameConfig?: Phaser.Types.Loader.FileTypes.ImageFrameConfig;
   scene: Phaser.Scene;
   moveKeys: MoveKeys;
+  camera?: Phaser.Cameras.Scene2D.Camera;
 }
 export type Sprite = Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
