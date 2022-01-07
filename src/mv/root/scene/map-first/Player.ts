@@ -24,29 +24,35 @@ export class Player {
   // cursors: Phaser.Types.Input.Keyboard.CursorKeys;
 
   keyboardKey: KeyboardKey;
+  text?: Phaser.GameObjects.Text;
 
   constructor(public opt: PlayerOptions) {
+    opt.depth = opt.depth ? opt.depth : 2
     // our two characters
     const { moveKeys, scene, name, url, frameConfig } = this.opt;
     const { input } = scene;
-    const { LEFT, RIGHT, UP, DOWN, SPEED_UP2X, SPEED_UP4X, } = moveKeys;
+    const { LEFT, RIGHT, UP, DOWN, SPEED_UP2X, SPEED_UP4X } = moveKeys;
     this.keyboardKey = {
       LEFT: input.keyboard.addKey(LEFT),
       RIGHT: input.keyboard.addKey(RIGHT),
       UP: input.keyboard.addKey(UP),
       DOWN: input.keyboard.addKey(DOWN),
-      SPEED_UP2X: SPEED_UP2X? input.keyboard.addKey(SPEED_UP2X) : undefined,
-      SPEED_UP4X: SPEED_UP4X? input.keyboard.addKey(SPEED_UP4X) : undefined,
+      SPEED_UP2X: SPEED_UP2X ? input.keyboard.addKey(SPEED_UP2X) : undefined,
+      SPEED_UP4X: SPEED_UP4X ? input.keyboard.addKey(SPEED_UP4X) : undefined,
     };
-    let {load} = this.opt
+    let { load } = this.opt;
     load = load ? load : new Phaser.Loader.LoaderPlugin(scene);
     load.spritesheet(name, url, frameConfig);
-    load.once(Phaser.Loader.Events.COMPLETE, () => {
-      this.init();
-    }, scene);
+    load.once(
+      Phaser.Loader.Events.COMPLETE,
+      () => {
+        this.init();
+      },
+      scene
+    );
     load.start();
   }
-  
+
   queue: Function[] = [];
 
   init() {
@@ -89,15 +95,31 @@ export class Player {
     });
     // this.player = this.physics.add.sprite(map.widthInPixels/2, map.heightInPixels/2, name, 6);
     const sprite = physics.add.sprite(800, 800, name, 6);
-    sprite.setDepth(2);
+    if(this.opt.depth) sprite.setDepth(this.opt.depth);
     sprite.setCollideWorldBounds(true);
     this.sprite = sprite;
-    const queue = this.queue;
-    this.queue = [];
-    queue.forEach((fn) => fn());
-    if(camera) {
+
+    this.start();
+    if (camera) {
+      camera.stopFollow();
       camera.startFollow(this.sprite);
+      camera.roundPixels = true; // avoid tile bleed
     }
+
+    const style: Phaser.Types.GameObjects.Text.TextStyle = {
+      font: "13px Arial",
+      color: "black",
+      wordWrap: { width: sprite.width },
+      align: "center",
+      // backgroundColor: "white",
+      padding: { left: 5, right: 5, top: 1, bottom: 1 },
+
+    };
+    this.text = scene.add.text(0, 0, '이름:'+name, style);
+    this.text.setOrigin(0.5, 0.5);
+    // this.text.setAlpha(0.5);
+    this.text.setBackgroundColor("#ffffff55");
+    if(this.opt.depth) this.text.setDepth(this.opt.depth);
   }
 
   addWall(wall: Phaser.Tilemaps.TilemapLayer) {
@@ -107,11 +129,19 @@ export class Player {
         this.opt.scene.physics.add.collider(this.sprite, wall);
       }
     };
-    if (!this.sprite) {
+    this.start(fn);
+  }
+
+  start(fn?: Function) {
+    if (fn) {
       this.queue.push(fn);
+    }
+    if (!this.sprite) {
       return;
     }
-    fn();
+    const queue = this.queue;
+    this.queue = [];
+    queue.forEach((fn) => fn());
   }
 
   overlap(
@@ -127,11 +157,7 @@ export class Player {
         this.opt.scene.physics.add.overlap(this.sprite, spawns, callback);
       }
     };
-    if (!this.sprite) {
-      this.queue.push(fn);
-      return;
-    }
-    fn();
+    this.start(fn);
   }
 
   update(time: number, delta: number) {
@@ -140,8 +166,8 @@ export class Player {
     const { LEFT, RIGHT, UP, DOWN, SPEED_UP2X, SPEED_UP4X } = this.keyboardKey;
     // const  LEFT = Phaser.Input.Keyboard.KeyCodes[moveKeys.LEFT] ;
 
-    const m1 = SPEED_UP2X ? SPEED_UP2X.isDown? 2: 1 : 1;
-    const m2 = SPEED_UP4X ? SPEED_UP4X.isDown? 4: 1 : 1;
+    const m1 = SPEED_UP2X ? (SPEED_UP2X.isDown ? 2 : 1) : 1;
+    const m2 = SPEED_UP4X ? (SPEED_UP4X.isDown ? 4 : 1) : 1;
     const speed = SPEED * m1 * m2;
     // Horizontal movement
     if (LEFT.isDown) {
@@ -171,6 +197,9 @@ export class Player {
     } else {
       this.sprite.anims.stop();
     }
+    if (!this.text) return;
+    this.text.x = Math.floor(this.sprite.x);
+    this.text.y = Math.floor(this.sprite.y - this.sprite.height);
   }
 }
 export interface PlayerOptions {
@@ -181,5 +210,6 @@ export interface PlayerOptions {
   scene: Phaser.Scene;
   moveKeys: MoveKeys;
   camera?: Phaser.Cameras.Scene2D.Camera;
+  depth?: number;
 }
 export type Sprite = Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;

@@ -1,5 +1,4 @@
 import Phaser from "phaser";
-import { IslandsMainScene } from "./scene/islands/IslandsMainScene";
 import { FPSScene } from "./scene/map-first/FPSScene";
 import { BootScene, WorldScene } from "./scene/map-first/TypeScene";
 
@@ -22,7 +21,7 @@ import { BootScene, WorldScene } from "./scene/map-first/TypeScene";
 // const ratio = Math.max(window.innerWidth / window.innerHeight, window.innerHeight / window.innerWidth)
 // const DEFAULT_HEIGHT = 720 // any height you want
 // const DEFAULT_WIDTH = ratio * DEFAULT_HEIGHT
-export function mvmain(canvas : HTMLCanvasElement) : Phaser.Game{
+export function mvmain(parent: HTMLElement, canvas : HTMLCanvasElement) : Phaser.Game{
   const game: Phaser.Game = new Phaser.Game({
 
     // parent,
@@ -38,13 +37,15 @@ export function mvmain(canvas : HTMLCanvasElement) : Phaser.Game{
       // autoCenter: Phaser.Scale.CENTER_BOTH,
       // width: DEFAULT_WIDTH,
       // height: DEFAULT_HEIGHT,
-      // width: '100%',
-      // height: '80%',
-
+      width: '100%',
+      height: '100%',
+      // width: window.innerWidth-1, 
+      // height: window.innerHeight-50,
       
     },
     zoom: 1,
-    pixelArt: true,
+    pixelArt: false,
+    
     physics: {
       default: "arcade",
       arcade: {
@@ -54,7 +55,10 @@ export function mvmain(canvas : HTMLCanvasElement) : Phaser.Game{
         },
         debug: true,
       },
+
+  
     },
+    
 
     scene: [BootScene, WorldScene, FPSScene],
     // scene: [IslandsMainScene],
@@ -70,7 +74,7 @@ export function mvmain(canvas : HTMLCanvasElement) : Phaser.Game{
     // game.config.width = DEFAULT_WIDTH
     // game.config.height = DEFAULT_HEIGHT
     // game.scale.resize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
-    // game.scale.resize(window.innerWidth, window.innerHeight-50);
+    game.scale.resize(window.innerWidth-1, window.innerHeight-50);
   });
   return game
 }
