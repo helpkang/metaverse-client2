@@ -1,0 +1,7 @@
+node_modules
+dist
+.cache
+.parcel-cache
+*.log
+.database
+.database.db

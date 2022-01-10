@@ -1,0 +1,26 @@
+{
+    "name": "metaverse-server",
+    "version": "1.0.0",
+    "main": "index.js",
+    "repository": "https://github.com/helpkang/metaverse-server.git",
+    "author": "ksi <helpkang@gmail.com>",
+    "license": "MIT",
+    "scripts": {
+        "start": "nodemon -e ts -w ./src"
+    },
+    "devDependencies": {
+        "@types/express": "^4.17.13",
+        "@types/node": "^16.11.7",
+        "@types/sqlite3": "^3.1.7",
+        "@types/ws": "^8.2.0",
+        "nodemon": "^2.0.15",
+        "ts-node": "^10.4.0",
+        "typescript": "^4.4.4"
+    },
+    "dependencies": {
+        "express": "^4.17.1",
+        "sqlite3": "^5.0.2",
+        "uuid": "^8.3.2",
+        "ws": "^8.2.3"
+    }
+}

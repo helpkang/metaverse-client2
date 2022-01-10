@@ -1,0 +1,6 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": false,
+    "typeRoots": ["./custom_typings", "./node_modules/@types"]
+  }
+}

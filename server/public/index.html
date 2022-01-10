@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>웹소켓</title>
+    <script>
+        // 1. 웹소켓 클라이언트 객체 생성 
+        const webSocket = new WebSocket("ws://localhost:3000/chat");
+    </script>
+</head>
+
+<body>
+    <h1>웹소켓 테스트</h1>
+    <!-- 버튼 2개 생성 -->
+    <button id="btn_send">메시지 전송</button>
+    <button id="btn_close">연결 끊기</button>
+
+</body>
+
+</html>
