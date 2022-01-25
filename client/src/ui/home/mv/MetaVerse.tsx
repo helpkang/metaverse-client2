@@ -22,7 +22,7 @@ function Metaverse() {
   }, []);
   return (
     <div>
-      <Link to="/mv">Other</Link> Metaverse
+      <Link to="/">Other</Link> Metaverse
       <div className="mv-container" ref={a} style={{width,height}}>
         <canvas ref={b}/>
       </div>

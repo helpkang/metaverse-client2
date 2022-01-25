@@ -19,7 +19,20 @@ interface KeyboardKey {
   SPEED_UP2X?: Phaser.Input.Keyboard.Key;
   SPEED_UP4X?: Phaser.Input.Keyboard.Key;
 }
-export class Player {
+export interface Player {
+  addWall(wall: Phaser.Tilemaps.TilemapLayer): void;
+  overlap(
+    spawns:
+      | Phaser.GameObjects.GameObject
+      | Phaser.GameObjects.GameObject[]
+      | Phaser.GameObjects.Group
+      | Phaser.GameObjects.Group[],
+    callback?: ArcadePhysicsCallback
+  ): void;
+  update(time: number, delta: number): void;
+}
+
+export class PlayerImpl implements Player {
   sprite?: Sprite;
   // cursors: Phaser.Types.Input.Keyboard.CursorKeys;
 
@@ -27,7 +40,7 @@ export class Player {
   text?: Phaser.GameObjects.Text;
 
   constructor(public opt: PlayerOptions) {
-    opt.depth = opt.depth ? opt.depth : 2
+    opt.depth = opt.depth ? opt.depth : 2;
     // our two characters
     const { moveKeys, scene, name, url, frameConfig } = this.opt;
     const { input } = scene;
@@ -55,7 +68,7 @@ export class Player {
 
   queue: Function[] = [];
 
-  init() {
+  private init() {
     const { name, scene, camera } = this.opt;
     const { anims, physics } = scene;
 
@@ -95,7 +108,7 @@ export class Player {
     });
     // this.player = this.physics.add.sprite(map.widthInPixels/2, map.heightInPixels/2, name, 6);
     const sprite = physics.add.sprite(800, 800, name, 6);
-    if(this.opt.depth) sprite.setDepth(this.opt.depth);
+    if (this.opt.depth) sprite.setDepth(this.opt.depth);
     sprite.setCollideWorldBounds(true);
     this.sprite = sprite;
 
@@ -113,16 +126,15 @@ export class Player {
       align: "center",
       // backgroundColor: "white",
       padding: { left: 5, right: 5, top: 1, bottom: 1 },
-
     };
-    this.text = scene.add.text(0, 0, '이름:'+name, style);
+    this.text = scene.add.text(0, 0, "이름:" + name, style);
     this.text.setOrigin(0.5, 0.5);
     // this.text.setAlpha(0.5);
     this.text.setBackgroundColor("#ffffff55");
-    if(this.opt.depth) this.text.setDepth(this.opt.depth);
+    if (this.opt.depth) this.text.setDepth(this.opt.depth);
   }
 
-  addWall(wall: Phaser.Tilemaps.TilemapLayer) {
+  public addWall(wall: Phaser.Tilemaps.TilemapLayer) {
     // don't walk on trees
     const fn = () => {
       if (this.sprite) {
@@ -132,7 +144,7 @@ export class Player {
     this.start(fn);
   }
 
-  start(fn?: Function) {
+  private start(fn?: Function) {
     if (fn) {
       this.queue.push(fn);
     }
@@ -144,7 +156,7 @@ export class Player {
     queue.forEach((fn) => fn());
   }
 
-  overlap(
+  public overlap(
     spawns:
       | Phaser.GameObjects.GameObject
       | Phaser.GameObjects.GameObject[]
@@ -160,7 +172,7 @@ export class Player {
     this.start(fn);
   }
 
-  update(time: number, delta: number) {
+  public update(time: number, delta: number) {
     if (!this.sprite) return;
     this.sprite.body.setVelocity(0);
     const { LEFT, RIGHT, UP, DOWN, SPEED_UP2X, SPEED_UP4X } = this.keyboardKey;
@@ -212,4 +224,20 @@ export interface PlayerOptions {
   camera?: Phaser.Cameras.Scene2D.Camera;
   depth?: number;
 }
+
+export class PalyerFactory {
+  static create(
+    wall: Phaser.Tilemaps.TilemapLayer,
+    opt: PlayerOptions,
+    spwans?: Phaser.Physics.Arcade.Group,
+    callback?: ArcadePhysicsCallback
+  ): Player {
+    const player = new PlayerImpl(opt);
+    player.addWall(wall);
+
+    if (spwans) player.overlap(spwans, callback);
+    return player;
+  }
+}
+
 export type Sprite = Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
