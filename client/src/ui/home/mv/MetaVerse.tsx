@@ -4,27 +4,29 @@ import { mvmain } from "../../../mv/root/mvmain";
 import "./MetaVerse.scss";
 
 function Metaverse() {
-  const [width, setWidth] = useState(window.innerWidth);
-  const [height, setHeight] = useState(window.innerHeight);
-  window.addEventListener("resize", () => {
-    setWidth(window.innerWidth);
-    setHeight(window.innerHeight);
-  });
+  const [size, setSize] = useState({width:window.innerWidth, height:window.innerHeight});
+  const listener = () => {
+    setTimeout(() => {
+      setSize({width:window.innerWidth, height:window.innerHeight});
+    }, 200);
+  };
+  window.addEventListener("resize", listener);
   const a = useRef(null);
   const b = useRef(null);
   useEffect(() => {
-    if (!a.current||!b.current) return;
+    if (!a.current || !b.current) return;
     const game: Phaser.Game = mvmain(a.current, b.current);
-
     return () => {
       game.destroy(true);
+      window.removeEventListener("resize", listener);
     };
   }, []);
+  const {width, height} = size
   return (
     <div>
       <Link to="/">Other</Link> Metaverse
-      <div className="mv-container" ref={a} style={{width,height}}>
-        <canvas ref={b}/>
+      <div className="mv-container" ref={a} style={{ width, height }}>
+        <canvas ref={b} />
       </div>
     </div>
   );
