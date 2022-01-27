@@ -64,7 +64,7 @@ export function mvmain(parent: HTMLElement, canvas : HTMLCanvasElement) : Phaser
     // scene: [IslandsMainScene],
   });
 
-  window.addEventListener("resize", () => {
+  const resizeListener = () => {
     // const ratio = Math.max(
     //   window.innerWidth / window.innerHeight,
     //   window.innerHeight / window.innerWidth
@@ -74,8 +74,15 @@ export function mvmain(parent: HTMLElement, canvas : HTMLCanvasElement) : Phaser
     // game.config.width = DEFAULT_WIDTH
     // game.config.height = DEFAULT_HEIGHT
     // game.scale.resize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
-    game.scale.resize(window.innerWidth-1, window.innerHeight-50);
-  });
+    setTimeout(()=>game.scale.resize(window.innerWidth-1, window.innerHeight-50), 500);
+  }
+  
+  window.addEventListener("resize", resizeListener);
+
+  game.events.on("destroy", () => {
+    window.removeEventListener("resize", resizeListener);
+  })
+
   return game
 }
 
