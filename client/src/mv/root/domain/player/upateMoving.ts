@@ -2,6 +2,7 @@ import { Sprite, KeyboardKey, SPEED } from "./Player";
 
 export function upateMoving(keyboardKey: KeyboardKey, sprite?: Sprite) {
   if (!sprite) return;
+  moveEvent(keyboardKey, sprite);
   sprite.body.setVelocity(0);
   const { LEFT, RIGHT, UP, DOWN, SPEED_UP2X, SPEED_UP4X } = keyboardKey;
   // const  LEFT = Phaser.Input.Keyboard.KeyCodes[moveKeys.LEFT] ;
@@ -35,5 +36,17 @@ export function upateMoving(keyboardKey: KeyboardKey, sprite?: Sprite) {
     sprite.anims.play("down", true);
   } else {
     sprite.anims.stop();
+  }
+}
+
+export function moveEvent(keyboardKey: KeyboardKey, sprite: Sprite) {
+  if (sprite.body.velocity.x !== 0 || sprite.body.velocity.y !== 0) {
+    //TODO: moveEvent 처리 서버에 동기화 하기, 반대로 서버에서 내려오는 것도 필요 할것 같음
+    const event ={
+      vX: sprite.body.velocity.x,
+      vY: sprite.body.velocity.y,
+      x: sprite.x,
+      y: sprite.y,
+    }
   }
 }
