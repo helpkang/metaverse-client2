@@ -1,6 +1,7 @@
 import Phaser from "phaser";
-import { FPSScene } from "./scene/map-first/FPSScene";
-import { BootScene, WorldScene } from "./scene/map-first/TypeScene";
+import { FPSScene } from "./scene/basic/FPSScene";
+import { BootScene } from "./scene/basic/BootScene";
+import { WorldScene } from "./domain/WoldScene";
 
 // import { MainScene, FPSScene } from "./scene";
 

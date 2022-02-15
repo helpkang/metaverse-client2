@@ -1,41 +1,24 @@
 import Phaser from "phaser";
+import { Player, Sprite, KeyboardKey, PlayerOptions, SPEED } from "./Player";
 
-const SPEED = 130;
-
-interface MoveKeys {
-  LEFT: string;
-  RIGHT: string;
-  UP: string;
-  DOWN: string;
-  SPEED_UP2X?: string;
-  SPEED_UP4X?: string;
-}
-
-interface KeyboardKey {
-  LEFT: Phaser.Input.Keyboard.Key;
-  RIGHT: Phaser.Input.Keyboard.Key;
-  UP: Phaser.Input.Keyboard.Key;
-  DOWN: Phaser.Input.Keyboard.Key;
-  SPEED_UP2X?: Phaser.Input.Keyboard.Key;
-  SPEED_UP4X?: Phaser.Input.Keyboard.Key;
-}
-export interface Player {
-  addWall(wall: Phaser.Tilemaps.TilemapLayer): void;
-  overlap(
-    spawns:
-      | Phaser.GameObjects.GameObject
-      | Phaser.GameObjects.GameObject[]
-      | Phaser.GameObjects.Group
-      | Phaser.GameObjects.Group[],
+export class PalyerFactory {
+  static create(
+    wall: Phaser.Tilemaps.TilemapLayer,
+    opt: PlayerOptions,
+    spwans?: Phaser.Physics.Arcade.Group,
     callback?: ArcadePhysicsCallback
-  ): void;
-  update(time: number, delta: number): void;
+  ): Player {
+    const player = new PlayerImpl(opt);
+    player.addWall(wall);
+
+    if (spwans) player.overlap(spwans, callback);
+    return player;
+  }
 }
 
 export class PlayerImpl implements Player {
   sprite?: Sprite;
   // cursors: Phaser.Types.Input.Keyboard.CursorKeys;
-
   keyboardKey: KeyboardKey;
   text?: Phaser.GameObjects.Text;
 
@@ -173,11 +156,15 @@ export class PlayerImpl implements Player {
   }
 
   public update(time: number, delta: number) {
+    this.upateMoving();
+    this.drawText();
+  }
+
+  private upateMoving() {
     if (!this.sprite) return;
     this.sprite.body.setVelocity(0);
     const { LEFT, RIGHT, UP, DOWN, SPEED_UP2X, SPEED_UP4X } = this.keyboardKey;
     // const  LEFT = Phaser.Input.Keyboard.KeyCodes[moveKeys.LEFT] ;
-
     const m1 = SPEED_UP2X ? (SPEED_UP2X.isDown ? 2 : 1) : 1;
     const m2 = SPEED_UP4X ? (SPEED_UP4X.isDown ? 4 : 1) : 1;
     const speed = SPEED * m1 * m2;
@@ -209,35 +196,11 @@ export class PlayerImpl implements Player {
     } else {
       this.sprite.anims.stop();
     }
-    if (!this.text) return;
+  }
+
+  private drawText() {
+    if (!this.text || !this.sprite) return;
     this.text.x = Math.floor(this.sprite.x);
     this.text.y = Math.floor(this.sprite.y - this.sprite.height);
   }
 }
-export interface PlayerOptions {
-  load?: Phaser.Loader.LoaderPlugin;
-  name: string;
-  url: string;
-  frameConfig?: Phaser.Types.Loader.FileTypes.ImageFrameConfig;
-  scene: Phaser.Scene;
-  moveKeys: MoveKeys;
-  camera?: Phaser.Cameras.Scene2D.Camera;
-  depth?: number;
-}
-
-export class PalyerFactory {
-  static create(
-    wall: Phaser.Tilemaps.TilemapLayer,
-    opt: PlayerOptions,
-    spwans?: Phaser.Physics.Arcade.Group,
-    callback?: ArcadePhysicsCallback
-  ): Player {
-    const player = new PlayerImpl(opt);
-    player.addWall(wall);
-
-    if (spwans) player.overlap(spwans, callback);
-    return player;
-  }
-}
-
-export type Sprite = Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
