@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import { MetaverseMap } from "./MetaverseMap";
-import { Player } from "./Player";
-import { PalyerFactory } from "./PlayerImpl";
+import { Player } from "./player/Player";
+import { PalyerFactory } from "./player/PalyerFactory";
 
 
 export class ManagePlayer
