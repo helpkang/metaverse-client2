@@ -3,7 +3,22 @@ import { MetaverseMap } from "./MetaverseMap";
 import { Player } from "./player/Player";
 import { PalyerFactory } from "./player/PalyerFactory";
 
-
+const frameInfo = {
+  "left": {
+    frames: [1, 7, 1, 13],
+    flipX: true,
+  },
+  "right": {
+    frames: [1, 7, 1, 13],
+  },
+  "up":
+  {
+    frames: [2, 8, 2, 14],
+  },
+  "down": {
+    frames: [0, 6, 0, 12],
+  },
+}
 export class ManagePlayer
 {
   players: Player[] = [];
@@ -68,6 +83,7 @@ export class ManagePlayer
         },
         camera: this.scene.cameras.main,
         depth: 3,
+        frameInfo,
       },
       this.getSpwans(),
       callback
@@ -93,6 +109,7 @@ export class ManagePlayer
         },
         camera: this.scene.cameras.main,
         depth: 2,
+        frameInfo,
       },
       this.getSpwans(),
       callback

@@ -1,7 +1,9 @@
 import Phaser from "phaser";
 import { createAnimation } from "./createAnimation";
+import { FrameInfo } from "./plaerType";
 import { Player, Sprite, KeyboardKey, PlayerOptions } from "./Player";
 import { upateMoving } from "./upateMoving";
+
 
 export class PlayerImpl implements Player {
   sprite?: Sprite;
@@ -39,10 +41,10 @@ export class PlayerImpl implements Player {
   queue: Function[] = [];
 
   private init() {
-    const { name, scene, camera } = this.opt;
+    const { name, scene, camera, frameInfo } = this.opt;
     const { anims, physics } = scene;
 
-    createAnimation(anims, name);
+    createAnimation(anims, name, frameInfo);
     // this.player = this.physics.add.sprite(map.widthInPixels/2, map.heightInPixels/2, name, 6);
     const sprite = physics.add.sprite(800, 800, name, 6);
     if (this.opt.depth) sprite.setDepth(this.opt.depth);
@@ -110,11 +112,11 @@ export class PlayerImpl implements Player {
   }
 
   public update(time: number, delta: number) {
-    upateMoving(this.keyboardKey, this.sprite );
+    upateMoving(this.keyboardKey, this.opt.frameInfo, this.sprite );
     this.drawText();
   }
 
-  
+
 
   private drawText() {
     if (!this.text || !this.sprite) return;

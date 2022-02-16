@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 
 
-export class DynamicLoad
+export class DynamicLoadMoveBackground
 {
   async load(scene: Phaser.Scene)
   {

@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { DynamicLoad } from "./DynamicLoad";
+import { DynamicLoadMoveBackground } from "./DynamicLoadMoveBackground";
 import { ManagePlayer } from "./ManagePlayer";
 import { MetaverseMapFactory } from "./MetaverseMap";
 
@@ -38,14 +38,14 @@ export class WorldScene extends Phaser.Scene {
     this.cameras.main.roundPixels = true; // avoid tile bleed
 
     const mvMap = MetaverseMapFactory.create({
-      wall: map.createLayer("wall", tiles),
+      wall: map.createLayer("wall", tiles)
     });
     this.managePlayer = new ManagePlayer(
       this,
       mvMap,
       this.onMeetEnemy.bind(this)
     );
-    new DynamicLoad().load(this)
+    new DynamicLoadMoveBackground().load(this)
   }
 
   public override update(time: number, delta: number) {

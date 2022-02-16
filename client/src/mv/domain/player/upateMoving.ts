@@ -1,6 +1,7 @@
+import { FrameInfo } from "./plaerType";
 import { Sprite, KeyboardKey, SPEED } from "./Player";
 
-export function upateMoving(keyboardKey: KeyboardKey, sprite?: Sprite) {
+export function upateMoving(keyboardKey: KeyboardKey, frameInfo:{ [key: string]: FrameInfo }, sprite?: Sprite) {
   if (!sprite) return;
   moveEvent(keyboardKey, sprite);
   const { LEFT, RIGHT, UP, DOWN, SPEED_UP2X, SPEED_UP4X } = keyboardKey;
@@ -26,18 +27,22 @@ export function upateMoving(keyboardKey: KeyboardKey, sprite?: Sprite) {
 
   // Update the animation last and give left/right animations precedence over up/down animations
   if (LEFT.isDown) {
-    anims.play("left", true);
-    sprite.flipX = true;
+    move("left", anims, sprite, frameInfo);
   } else if (RIGHT.isDown) {
-    anims.play("right", true);
-    sprite.flipX = false;
+    move("right", anims, sprite, frameInfo);
   } else if (UP.isDown) {
-    anims.play("up", true);
+    move("up", anims, sprite, frameInfo);
   } else if (DOWN.isDown) {
-    anims.play("down", true);
+    move("down", anims, sprite, frameInfo);
   } else {
     anims.stop();
   }
+}
+
+function move(direction: string, anims: Phaser.Animations.AnimationState, sprite: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody, frameInfo:{ [key: string]: FrameInfo }) {
+  sprite.flipX = !!frameInfo[direction].flipX;
+  anims.play(direction, true);
+  // sprite.flipX = true;
 }
 
 export function moveEvent(keyboardKey: KeyboardKey, sprite: Sprite) {

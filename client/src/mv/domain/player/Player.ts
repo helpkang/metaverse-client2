@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import { FrameInfo } from "./plaerType";
 
 export interface Player {
   addWall(wall: Phaser.Tilemaps.TilemapLayer): void;
@@ -43,6 +44,7 @@ export interface PlayerOptions {
   moveKeys: MoveKeys;
   camera?: Phaser.Cameras.Scene2D.Camera;
   depth?: number;
+  frameInfo: {[key:string]: FrameInfo};
 }
 
 

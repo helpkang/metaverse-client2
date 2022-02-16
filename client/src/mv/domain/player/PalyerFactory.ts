@@ -8,6 +8,7 @@ export class PalyerFactory
   static create(
     wall: Phaser.Tilemaps.TilemapLayer,
     opt: PlayerOptions,
+    
     spwans?: Phaser.Physics.Arcade.Group,
     callback?: ArcadePhysicsCallback
   ): Player
