@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import './index.scss';
 import reportWebVitals from './reportWebVitals';
 import Home from './ui/home/Home';
@@ -9,7 +9,8 @@ import Metaverse from './ui/home/mv/MetaVerse';
 ReactDOM.render(
   <BrowserRouter>
   <Routes>
-    <Route path="/" element={<Home />} />
+    <Route path="/" element={<Navigate to="/mv" />} />
+    <Route path="/home" element={<Home />} />
     <Route path="/mv" element={<Metaverse />} />
   </Routes>
   </BrowserRouter>,
