@@ -19,6 +19,23 @@ const frameInfo = {
     frames: [0, 6, 0, 12],
   },
 }
+
+const frameInfoNew = {
+  "left": {
+    frames: [6, 7, 8],
+  },
+  "right": {
+    frames: [6, 7, 8],
+    flipX: true,
+  },
+  "up":
+  {
+    frames: [3,4,5],
+  },
+  "down": {
+    frames: [0,1,2],
+  },
+}
 export class ManagePlayer
 {
   players: Player[] = [];
@@ -67,11 +84,11 @@ export class ManagePlayer
       wall,
       {
         name: "player",
-        url: "/assets/image/RPG_assets.png",
+        url: "/assets/image/avatar01_26x34.png",
         scene: this.scene,
         frameConfig: {
-          frameWidth: 16,
-          frameHeight: 16,
+          frameWidth: 26,
+          frameHeight: 34,
         },
         moveKeys: {
           LEFT: "LEFT",
@@ -83,7 +100,7 @@ export class ManagePlayer
         },
         camera: this.scene.cameras.main,
         depth: 3,
-        frameInfo,
+        frameInfo: frameInfoNew,
       },
       this.getSpwans(),
       callback
