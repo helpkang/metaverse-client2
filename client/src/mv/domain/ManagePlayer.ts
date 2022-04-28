@@ -91,10 +91,10 @@ export class ManagePlayer
           frameHeight: 34,
         },
         moveKeys: {
-          LEFT: "LEFT",
-          RIGHT: "RIGHT",
-          UP: "UP",
-          DOWN: "DOWN",
+          LEFT: ["LEFT"],
+          RIGHT: ["RIGHT"],
+          UP: ["UP"],
+          DOWN: ["DOWN"],
           SPEED_UP2X: "SHIFT",
           SPEED_UP4X: "CTRL",
         },
@@ -108,8 +108,8 @@ export class ManagePlayer
     const p2 = PalyerFactory.create(
       wall,
       {
-        load: this.scene.load,
-        name: "they",
+        // load: this.scene.load,
+        name: "player2",
         url: "/assets/image/RPG_assets.png",
         scene: this.scene,
         frameConfig: {
@@ -131,8 +131,9 @@ export class ManagePlayer
       this.getSpwans(),
       callback
     );
+    this.players.push(p2);   
     this.players.push(p1);
-    this.players.push(p2);
+
   }
 
   update(time: number, delta: number)

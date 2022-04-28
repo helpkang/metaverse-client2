@@ -11,7 +11,7 @@ export function createAnimation(
   keys.forEach(key => {
     const { frames } = frameInfo[key];
     anims.create({
-      key,
+      key: name+'_'+key,
       frames: anims.generateFrameNumbers(name, {
         frames,
       }),

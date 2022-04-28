@@ -1,9 +1,7 @@
 import Phaser from "phaser";
 import { createAnimation } from "./createAnimation";
-import { FrameInfo } from "./plaerType";
 import { Player, Sprite, KeyboardKey, PlayerOptions } from "./Player";
 import { upateMoving } from "./upateMoving";
-
 
 export class PlayerImpl implements Player {
   sprite?: Sprite;
@@ -18,10 +16,10 @@ export class PlayerImpl implements Player {
     const { input } = scene;
     const { LEFT, RIGHT, UP, DOWN, SPEED_UP2X, SPEED_UP4X } = moveKeys;
     this.keyboardKey = {
-      LEFT: input.keyboard.addKey(LEFT),
-      RIGHT: input.keyboard.addKey(RIGHT),
-      UP: input.keyboard.addKey(UP),
-      DOWN: input.keyboard.addKey(DOWN),
+      LEFT: getKeys(input, LEFT),
+      RIGHT: getKeys(input, RIGHT),
+      UP: getKeys(input, UP),
+      DOWN: getKeys(input, DOWN),
       SPEED_UP2X: SPEED_UP2X ? input.keyboard.addKey(SPEED_UP2X) : undefined,
       SPEED_UP4X: SPEED_UP4X ? input.keyboard.addKey(SPEED_UP4X) : undefined,
     };
@@ -112,11 +110,9 @@ export class PlayerImpl implements Player {
   }
 
   public update(time: number, delta: number) {
-    upateMoving(this.keyboardKey, this.opt.frameInfo, this.sprite );
+    upateMoving(this.opt.name, this.keyboardKey, this.opt.frameInfo, this.sprite);
     this.drawText();
   }
-
-
 
   private drawText() {
     if (!this.text || !this.sprite) return;
@@ -125,6 +121,12 @@ export class PlayerImpl implements Player {
   }
 }
 
-
-
-
+function getKeys(
+  input: Phaser.Input.InputPlugin,
+  LEFT: string | string[]
+): Phaser.Input.Keyboard.Key | Phaser.Input.Keyboard.Key[] {
+  if (typeof LEFT === "string") {
+    return input.keyboard.addKey(LEFT);
+  }
+  return LEFT.map((key) => input.keyboard.addKey(key));
+}

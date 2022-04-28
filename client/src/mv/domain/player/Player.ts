@@ -17,19 +17,19 @@ export interface Player {
 export const SPEED = 130;
 
 interface MoveKeys {
-  LEFT: string;
-  RIGHT: string;
-  UP: string;
-  DOWN: string;
+  LEFT: string|string[];
+  RIGHT: string|string[];
+  UP: string|string[];
+  DOWN: string|string[];
   SPEED_UP2X?: string;
   SPEED_UP4X?: string;
 }
 
 export interface KeyboardKey {
-  LEFT: Phaser.Input.Keyboard.Key;
-  RIGHT: Phaser.Input.Keyboard.Key;
-  UP: Phaser.Input.Keyboard.Key;
-  DOWN: Phaser.Input.Keyboard.Key;
+  LEFT: Phaser.Input.Keyboard.Key|Phaser.Input.Keyboard.Key[];
+  RIGHT: Phaser.Input.Keyboard.Key|Phaser.Input.Keyboard.Key[];
+  UP: Phaser.Input.Keyboard.Key|Phaser.Input.Keyboard.Key[];
+  DOWN: Phaser.Input.Keyboard.Key|Phaser.Input.Keyboard.Key[];
   SPEED_UP2X?: Phaser.Input.Keyboard.Key;
   SPEED_UP4X?: Phaser.Input.Keyboard.Key;
 }
