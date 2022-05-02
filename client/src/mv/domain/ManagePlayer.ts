@@ -84,7 +84,7 @@ export class ManagePlayer
       wall,
       {
         name: "player",
-        url: "/assets/image/avatar01_26x34.png",
+        url: "/assets/image/avatar/avatar_w04_26x34.png",
         scene: this.scene,
         frameConfig: {
           frameWidth: 26,
