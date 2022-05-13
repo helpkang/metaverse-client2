@@ -24,7 +24,7 @@ function Metaverse() {
   const {width, height} = size
   return (
     <div>
-      <Link to="/home">HOME</Link> Metaverse
+      {/* <Link to="/home">HOME</Link> Metaverse */}
       <div className="mv-container" ref={a} style={{ width, height }}>
         <canvas ref={b} />
       </div>

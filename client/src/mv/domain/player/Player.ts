@@ -45,6 +45,7 @@ export interface PlayerOptions {
   camera?: Phaser.Cameras.Scene2D.Camera;
   depth?: number;
   frameInfo: {[key:string]: FrameInfo};
+  position: {x: number, y: number};
 }
 
 

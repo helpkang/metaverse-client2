@@ -1,0 +1,15 @@
+{
+    "columns": 1,
+    "image": "/image/map/transparency16x16.png",
+    "imageheight": 16,
+    "imagewidth": 16,
+    "margin": 0,
+    "name": "transparency16x16",
+    "spacing": 1,
+    "tilecount": 1,
+    "tiledversion": "1.7.2",
+    "tileheight": 16,
+    "tilewidth": 16,
+    "type": "tileset",
+    "version": "1.6"
+}

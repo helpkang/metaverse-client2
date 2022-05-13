@@ -83,9 +83,9 @@ export class ManagePlayer
     const p1 = PalyerFactory.create(
       wall,
       {
-        name: "player",
-        url: "/assets/image/avatar/avatar_w04_26x34.png",
+        name: "고객",
         scene: this.scene,
+        url: "/assets/image/avatar/avatar_m05_26x34.png",
         frameConfig: {
           frameWidth: 26,
           frameHeight: 34,
@@ -98,23 +98,25 @@ export class ManagePlayer
           SPEED_UP2X: "SHIFT",
           SPEED_UP4X: "CTRL",
         },
-        camera: this.scene.cameras.main,
+        // camera: this.scene.cameras.main,
         depth: 3,
         frameInfo: frameInfoNew,
+        position: { x: 400, y: 470 },
       },
       this.getSpwans(),
       callback
-    );
-    const p2 = PalyerFactory.create(
-      wall,
-      {
+      );
+      const p2 = PalyerFactory.create(
+        wall,
+        {
+        position: { x: 1005, y: 200 },
         // load: this.scene.load,
-        name: "player2",
-        url: "/assets/image/RPG_assets.png",
+        name: "상담원",
         scene: this.scene,
+        url: "/assets/image/avatar/avatar_w04_26x34.png",
         frameConfig: {
-          frameWidth: 16,
-          frameHeight: 16,
+          frameWidth: 26,
+          frameHeight: 34,
         },
         moveKeys: {
           LEFT: "A",
@@ -126,7 +128,7 @@ export class ManagePlayer
         },
         camera: this.scene.cameras.main,
         depth: 2,
-        frameInfo,
+        frameInfo: frameInfoNew,
       },
       this.getSpwans(),
       callback

@@ -46,7 +46,7 @@ export function mvmain(parent: HTMLElement, canvas : HTMLCanvasElement) : Phaser
       
     },
     zoom: 1,
-    pixelArt: true,
+    pixelArt: false,
     
     physics: {
       default: "arcade",

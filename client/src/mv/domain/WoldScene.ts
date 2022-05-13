@@ -12,32 +12,32 @@ export class WorldScene extends Phaser.Scene {
 
   public preload() {
     // map tiles
-    this.load.image("tiles", "/assets/image/grass-tiles-2-small.png");
+    this.load.image("ground", "/assets/image/map/tiledmap.png");
+    this.load.image("wall", "/assets/image/map/transparency16x16.png");
 
     // map in json format
-    this.load.tilemapTiledJSON("map", "/assets/tilemaps/basemap.json");
+    this.load.tilemapTiledJSON("map", "/assets/tilemaps/ke1.json");
   }
 
   public create() {
     // create the map
+
+
     const map = this.createMap();
 
-    // first parameter is the name of the tilemap in tiled
-    const tiles = this.createTiles(map);
-
     // creating the layers
-    this.createLayer(map, tiles);
+    this.createLayer(map);
     // don't go out of the map
     this.createWorldRange(map);
 
     // limit camera to map
     this.createCameraRange(map); // avoid tile bleed
 
-    const mvMap = this.createMvMap(map, tiles);
+    const mvMap = this.createMvMap(map);
 
     this.createPlayer(mvMap);
 
-    this.createDynamicMove();
+    // this.createDynamicMove();
   }
 
   public override update(time: number, delta: number) {
@@ -75,12 +75,12 @@ export class WorldScene extends Phaser.Scene {
     );
   }
 
-  private createMvMap(
-    map: Phaser.Tilemaps.Tilemap,
-    tiles: Phaser.Tilemaps.Tileset
-  ) {
+  private createMvMap(map: Phaser.Tilemaps.Tilemap) {
+    // first parameter is the name of the tilemap in tiled
+    const wallTile = map.addTilesetImage("transparency16x16", "wall");
+
     return MetaverseMapFactory.create({
-      wall: map.createLayer("wall", tiles),
+      wall: map.createLayer("wall", wallTile),
     });
   }
 
@@ -94,15 +94,12 @@ export class WorldScene extends Phaser.Scene {
     this.physics.world.bounds.height = map.heightInPixels;
   }
 
-  private createLayer(
-    map: Phaser.Tilemaps.Tilemap,
-    tiles: Phaser.Tilemaps.Tileset
-  ) {
-    map.createLayer("ground", tiles);
-  }
-
-  private createTiles(map: Phaser.Tilemaps.Tilemap) {
-    return map.addTilesetImage("grass-tiles-2-small", "tiles");
+  
+  private createLayer(map: Phaser.Tilemaps.Tilemap) {
+    this.add.image(0, 0, "ground").setOrigin(0, 0);
+    // first parameter is the name of the tilemap in tiled
+    // const groundImage = map.addTilesetImage("ground", "ground");
+    // map.createLayer("ground", groundImage);
   }
 
   private createMap() {

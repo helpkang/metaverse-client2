@@ -39,12 +39,12 @@ export class PlayerImpl implements Player {
   queue: Function[] = [];
 
   private init() {
-    const { name, scene, camera, frameInfo } = this.opt;
+    const { name, scene, camera, frameInfo, position } = this.opt;
     const { anims, physics } = scene;
 
     createAnimation(anims, name, frameInfo);
     // this.player = this.physics.add.sprite(map.widthInPixels/2, map.heightInPixels/2, name, 6);
-    const sprite = physics.add.sprite(800, 800, name, 6);
+    const sprite = physics.add.sprite(position.x, position.y, name, 1);
     if (this.opt.depth) sprite.setDepth(this.opt.depth);
     sprite.setCollideWorldBounds(true);
     this.sprite = sprite;
@@ -64,7 +64,7 @@ export class PlayerImpl implements Player {
       // backgroundColor: "white",
       padding: { left: 5, right: 5, top: 1, bottom: 1 },
     };
-    this.text = scene.add.text(0, 0, "이름:" + name, style);
+    this.text = scene.add.text(0, 0, "" + name, style);
     this.text.setOrigin(0.5, 0.5);
     // this.text.setAlpha(0.5);
     this.text.setBackgroundColor("#ffffff55");
@@ -90,7 +90,7 @@ export class PlayerImpl implements Player {
     }
     const queue = this.queue;
     this.queue = [];
-    queue.forEach((fn) => fn());
+    queue.forEach((qfn) => qfn());
   }
 
   public overlap(
