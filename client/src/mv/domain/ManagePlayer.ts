@@ -4,40 +4,37 @@ import { Player } from "./player/Player";
 import { PalyerFactory } from "./player/PalyerFactory";
 
 const frameInfo = {
-  "left": {
+  left: {
     frames: [1, 7, 1, 13],
     flipX: true,
   },
-  "right": {
+  right: {
     frames: [1, 7, 1, 13],
   },
-  "up":
-  {
+  up: {
     frames: [2, 8, 2, 14],
   },
-  "down": {
+  down: {
     frames: [0, 6, 0, 12],
   },
-}
+};
 
 const frameInfoNew = {
-  "left": {
+  left: {
     frames: [6, 7, 8],
   },
-  "right": {
+  right: {
     frames: [6, 7, 8],
     flipX: true,
   },
-  "up":
-  {
-    frames: [3,4,5],
+  up: {
+    frames: [3, 4, 5],
   },
-  "down": {
-    frames: [0,1,2],
+  down: {
+    frames: [0, 1, 2],
   },
-}
-export class ManagePlayer
-{
+};
+export class ManagePlayer {
   players: Player[] = [];
 
   spawns?: Phaser.Physics.Arcade.Group;
@@ -45,41 +42,40 @@ export class ManagePlayer
   constructor(
     private scene: Phaser.Scene,
     private mvMap: MetaverseMap,
-    private callback?: ArcadePhysicsCallback,
-  )
-  {
+    private callback?: ArcadePhysicsCallback
+  ) {
     this.dynamicPlayerAll(callback);
   }
 
-
-  private getSpwans(): Phaser.Physics.Arcade.Group
-  {
-    if (this.spawns)
+  private getSpwans(): Phaser.Physics.Arcade.Group {
+    if (this.spawns) {
       return this.spawns;
+    }
     // where the enemies will be
     this.spawns = this.scene.physics.add.group({
       classType: Phaser.GameObjects.Zone,
     });
-    for (var i = 0; i < 30; i++)
-    {
-      var x = Phaser.Math.RND.between(0, this.scene.physics.world.bounds.width);
-      var y = Phaser.Math.RND.between(
-        0,
-        this.scene.physics.world.bounds.height
-      );
-      // parameters are x, y, width, height
-      this.spawns.create(x, y);
-    }
+
+    // parameters are x, y, width, height
+    
+
     return this.spawns;
   }
 
+  create(x: number, y: number, width:number, height:number): any{
+    const zone = this.spawns?.create(x-(width/2), y-(width/2));
+    zone.body.width = width;
+    zone.body.height = height;
+    return zone;
+  }
 
-  async dynamicPlayerAll(callback?: ArcadePhysicsCallback)
-  {
+  async dynamicPlayerAll(callback?: ArcadePhysicsCallback) {
     const wall = this.mvMap?.getWall();
-    if (!wall)
-      return;
-
+    if (!wall) return;
+    const position = { x: 1005, y: 470 };
+    const position2 = { x: 1005, y: 200 };
+    const s = this.getSpwans();
+    const zone =  this.create(position2.x, position2.y, 200, 200);
     const p1 = PalyerFactory.create(
       wall,
       {
@@ -101,15 +97,16 @@ export class ManagePlayer
         // camera: this.scene.cameras.main,
         depth: 3,
         frameInfo: frameInfoNew,
-        position: { x: 400, y: 470 },
+        camera: this.scene.cameras.main,
+        position,
       },
-      this.getSpwans(),
+      s,
       callback
-      );
-      const p2 = PalyerFactory.create(
-        wall,
-        {
-        position: { x: 1005, y: 200 },
+    );
+    const p2 = PalyerFactory.create(
+      wall,
+      {
+        position: position2,
         // load: this.scene.load,
         name: "상담원",
         scene: this.scene,
@@ -126,22 +123,18 @@ export class ManagePlayer
           SPEED_UP2X: "ALT",
           SPEED_UP4X: "CTRL",
         },
-        camera: this.scene.cameras.main,
+
         depth: 2,
         frameInfo: frameInfoNew,
-      },
-      this.getSpwans(),
-      callback
+        zone,
+      }
     );
-    this.players.push(p2);   
+    this.players.push(p2);
     this.players.push(p1);
-
   }
 
-  update(time: number, delta: number)
-  {
-    this.players.forEach((player) =>
-    {
+  update(time: number, delta: number) {
+    this.players.forEach((player) => {
       player.update(time, delta);
     });
   }

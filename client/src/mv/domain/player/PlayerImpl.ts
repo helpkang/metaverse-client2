@@ -35,6 +35,9 @@ export class PlayerImpl implements Player {
     );
     load.start();
   }
+  getSprite(): Phaser.GameObjects.Sprite|undefined{
+    return this.sprite;
+  }
 
   queue: Function[] = [];
 
@@ -111,6 +114,12 @@ export class PlayerImpl implements Player {
 
   public update(time: number, delta: number) {
     upateMoving(this.opt.name, this.keyboardKey, this.opt.frameInfo, this.sprite);
+    if(this.opt.zone&& this.sprite){
+      const {zone} = this.opt;
+      const {body} = zone;
+      body.x = this.sprite.x - (body.width/2);
+      body.y = this.sprite.y - (body.height/2);
+    }
     this.drawText();
   }
 

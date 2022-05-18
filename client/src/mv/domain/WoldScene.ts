@@ -1,13 +1,29 @@
 import Phaser from "phaser";
+import { v1 as uuidv1 } from 'uuid';
 import { DynamicLoadMoveBackground } from "./DynamicLoadMoveBackground";
 import { ManagePlayer } from "./ManagePlayer";
 import { MetaverseMap, MetaverseMapFactory } from "./MetaverseMap";
 
-export class WorldScene extends Phaser.Scene {
-  managePlayer?: ManagePlayer;
+import { interval, Observable, Subscriber } from 'rxjs';
+import { throttle } from 'rxjs/operators';
 
+export class WorldScene extends Phaser.Scene {
+  state = new SwitchChatState();
+  managePlayer?: ManagePlayer;
+  subscriber?: Subscriber<any>;
+
+
+  observable = new Observable<any>(subscriber => {
+    this.subscriber = subscriber;
+  });
   constructor() {
     super({ key: "WorldScene" });
+
+    this.state.setOnChat(()=>{console.log('onChat event')})
+    this.state.setOffChat(()=>{console.log('offChat event')})
+    this.observable.pipe(throttle(() => interval(100))).subscribe(()=>{
+      this.state.onState();
+    })
   }
 
   public preload() {
@@ -21,7 +37,6 @@ export class WorldScene extends Phaser.Scene {
 
   public create() {
     // create the map
-
 
     const map = this.createMap();
 
@@ -49,18 +64,16 @@ export class WorldScene extends Phaser.Scene {
     zone: Phaser.Types.Physics.Arcade.GameObjectWithBody
   ) {
     // we move the zone to some other location
-    zone.body.x = Phaser.Math.RND.between(0, this.physics.world.bounds.width);
-    zone.body.y = Phaser.Math.RND.between(0, this.physics.world.bounds.height);
+    // zone.body.x = Phaser.Math.RND.between(0, this.physics.world.bounds.width);
+    // zone.body.y = Phaser.Math.RND.between(0, this.physics.world.bounds.height);
     // this.cameras.main.fadeOut(200).fadeIn(200);
-    this.cameras.main.flash(200);
-
+    // this.cameras.main.flash(200);
     // shake the world
     // this.cameras.main.shake(300);
-
     // const isFpsSleeping  = this.scene.isSleeping('FpsScene')
     // isFpsSleeping ? this.scene.sleep('FpsScene') : this.scene.wake('FpsScene')
-
     // start battle
+    this.subscriber?.next(1);
   }
 
   private createDynamicMove() {
@@ -80,7 +93,7 @@ export class WorldScene extends Phaser.Scene {
     const wallTile = map.addTilesetImage("transparency16x16", "wall");
 
     return MetaverseMapFactory.create({
-      wall: map.createLayer("wall", wallTile),
+      wall: map.createLayer("wall", "wallTile"),
     });
   }
 
@@ -94,7 +107,6 @@ export class WorldScene extends Phaser.Scene {
     this.physics.world.bounds.height = map.heightInPixels;
   }
 
-  
   private createLayer(map: Phaser.Tilemaps.Tilemap) {
     this.add.image(0, 0, "ground").setOrigin(0, 0);
     // first parameter is the name of the tilemap in tiled
@@ -104,5 +116,80 @@ export class WorldScene extends Phaser.Scene {
 
   private createMap() {
     return this.make.tilemap({ key: "map" });
+  }
+}
+
+interface ChatEventListener {
+  setOnChat(fn:Function):void
+  setOffChat(fn:Function):void
+
+}
+class SwitchChatState implements ChatState, ChatEventListener {
+  onchat?: Function;
+  offchat?: Function;
+
+  setOnChat(fn:Function):void {
+    this.onchat = fn;
+  }
+
+  setOffChat(fn:Function):void {
+    this.offchat = fn;
+  }
+
+  state = new OffChatState();
+
+  getUUID(): string {
+    return this.state.getUUID();
+  }
+
+  isChat(): boolean {
+    return this.isChat();
+  }
+
+  onState() {
+    if(!this.state.isChat()){
+      this.onchat?.();
+    }
+    this.state = new OnChatState(this);
+  }
+
+  offState() {
+    if(this.state.isChat()) {
+      this.offchat?.();
+    }
+    this.state = new OffChatState();
+  }
+}
+
+interface ChatState {
+  isChat(): boolean;
+  getUUID(): string;
+}
+
+class OnChatState implements ChatState {
+  uuid = uuidv1();
+
+  constructor(private superState: SwitchChatState) {
+    setTimeout(() => {
+      if (this.superState.getUUID() === this.getUUID()) {
+        this.superState.offState();
+      }
+    }, 500);
+  }
+  getUUID(): string {
+    return this.uuid;
+  }
+
+  isChat(): boolean {
+    return true;
+  }
+}
+
+class OffChatState implements ChatState {
+  getUUID(): string {
+    return "1";
+  }
+  isChat(): boolean {
+    return false;
   }
 }

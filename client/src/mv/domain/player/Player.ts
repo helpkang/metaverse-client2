@@ -12,6 +12,7 @@ export interface Player {
     callback?: ArcadePhysicsCallback
   ): void;
   update(time: number, delta: number): void;
+  getSprite(): Phaser.GameObjects.Sprite|undefined;
 }
 
 export const SPEED = 130;
@@ -46,6 +47,7 @@ export interface PlayerOptions {
   depth?: number;
   frameInfo: {[key:string]: FrameInfo};
   position: {x: number, y: number};
+  zone?: any;
 }
 
 
